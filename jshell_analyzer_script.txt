@@ -1,0 +1,89 @@
+import com.kirkk.analyzer.Analyzer;
+
+File f = new File("../tomcat_jars");
+Analyzer a = new Analyzer();
+Jar[] jarArr = a.analyze(f);
+BufferedWriter writer = new BufferedWriter(new FileWriter("/home/kali/jarAnalyzer.txt"));
+for(Jar j : jarArr){
+    String jarName = j.getJarFileName();
+   writer.write("getJarFileName: "+jarName+"\n");
+   writer.write("calculateInstability: "+String.valueOf(j.calculateMetrics().calculateInstability())+"\n");
+   writer.write("calculateDistance: "+String.valueOf(j.calculateMetrics().calculateDistance())+"\n");
+   List l1 = j.getOutgoingDependencies();
+   List l2 = j.getIncomingDependencies();
+   List l3 = j.getAllExternallyReferencedPackages();
+   List l4 = j.getAllUnidentifiableExternallyReferencedPackages();
+   List l5 = j.getAllContainedPackages();
+   if (l5.size()<1){
+      writer.write("getAllContainedPackages: []"+"\n");
+   } else{   
+      for(int i = 0; i < l5.size(); i++){
+         JarPackage jP = (JarPackage)l5.get(i);
+         writer.write("\t>>> JarPackage.getLongName: "+jP.getLongName()+"\n");
+         List l6 = jP.getClasses();
+         if (l6.size()<1){
+            writer.write("\t\tgetClasses: []"+"\n");
+         } else{
+            for(int kk = 0; kk < l6.size(); kk++){
+               JarClass jC = (JarClass)l6.get(kk);
+               writer.write("\t\t>>> JarClass.getLongName: "+jC.getLongName()+"\n");
+               List l6a = jC.getImportedPackageNames();
+               if (l6a.size()<1){
+                  writer.write("\t\t\t>>> getImportedPackageNames: []"+"\n");
+               }else {
+                  for(int hhh = 0; hhh < l6a.size(); hhh++){
+                     String jPP = (String)l6a.get(hhh);
+                     writer.write("\t\t\t>>> getImportedPackageNames: "+jPP+"\n");
+                  }
+               }
+            }
+         }
+      }
+   }
+   writer.write("---------------------------------------------"+"\n");
+    writer.write("\t>>> IMPORTS:"+"\n");
+   if (l1.size()<1){
+    //   writer.write("getOutgoingDependencies: []"+"\n");
+      writer.write("\t\t>>> []"+"\n");
+   } else{
+      for(int i = 0; i < l1.size(); i++){
+         Jar tmpJar = (Jar)l1.get(i);
+        //  writer.write("\t>>> getOutgoingDependencies: "+tmpJar.getJarFileName()+"\n");
+         writer.write("\t\t>>> "+tmpJar.getJarFileName()+"\n");
+      }
+   }
+   writer.write("---------------------------------------------"+"\n");
+      writer.write("\t>>> EXPORTS TO:"+"\n"); 
+   if (l2.size()<1){
+    //   writer.write("getIncomingDependencies: []"+"\n");
+      writer.write("\t\t>>> []"+"\n");
+   } else{
+      for(int i = 0; i < l2.size(); i++){
+         Jar tmpJar2 = (Jar)l2.get(i);
+        //  writer.write("\t>>> getIncomingDependencies: "+tmpJar2.getJarFileName()+"\n");
+        writer.write("\t\t>>> "+tmpJar2.getJarFileName()+"\n");
+      }
+   }
+   writer.write("---------------------------------------------"+"\n");
+    writer.write("getAllExternallyReferencedPackages: "+"\n");
+   if (l3.size()<1){
+      writer.write("\t\t>>> []"+"\n");
+   } else{   
+      for(int i = 0; i < l3.size(); i++){
+         String tmpStr = (String)l3.get(i);
+         writer.write("\t\t>>> "+tmpStr+"\n");
+      }
+   }
+   writer.write("---------------------------------------------"+"\n");
+    writer.write("getAllExternallyReferencedPackages: "+"\n");
+   if (l4.size()<1){
+      writer.write("\t\t>>> []"+"\n");
+   } else{   
+      for(int i = 0; i < l4.size(); i++){
+         String tmpStr = (String)l4.get(i);
+         writer.write("\t\t>>> "+tmpStr+"\n");
+      }  
+   }
+   writer.write("======================================================================================"+"\n");
+}
+writer.close()
